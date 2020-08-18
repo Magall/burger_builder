@@ -1,18 +1,14 @@
-import React from "react";
-import "./BuildControl.scss";
-const buildControl = (props) => {
-    console.log()
+import React from 'react';
+import './BuildControl.scss';
+
+const buildControl = ({ label, removed, disabled, added }) => {
   return (
     <div id="buildControl">
-      <div className="Label">{props.label}</div>
-      <button
-        className="Less"
-        onClick={props.removed}
-        disabled={props.disabled}
-      >
+      <div className="Label">{label}</div>
+      <button className="Less" onClick={removed} disabled={disabled}>
         Less
       </button>
-      <button className="More" onClick={props.added}>
+      <button className="More" onClick={added}>
         More
       </button>
     </div>
