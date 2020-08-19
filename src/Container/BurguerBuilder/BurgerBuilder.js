@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
-import Burger from './../../components/Burger/Burger';
-import BuildControls from './../../components/Burger/BuildControls/BuildControls';
-import { array } from 'prop-types';
+import React, { Component } from "react";
+import Burger from "./../../components/Burger/Burger";
+import BuildControls from "./../../components/Burger/BuildControls/BuildControls";
 
 const INGREDIENT_PRICES = {
   salad: 0.5,
@@ -26,34 +25,44 @@ export default class BurgerBuilder extends Component {
       meat: true,
     },
     totalPrice: 4,
+    purchasable: false,
   };
 
-  // Does it needs to be a function? I meant, it can be only a variable.
-  // It's not being used.
-  isDisabled = (type) => {
-    return this.state.ingredients[type] === 0;
+  purchasableHandler = (ing) => {
+    
+    const sum = Object.keys(ing)
+      .map((el) => {
+        return ing[el];
+      })
+      .reduce((sum, el) => {
+        return sum + el;
+      }, 0);
+    this.setState({purchasable:sum>0})
   };
 
   addIngredientHandler = (type) => {
     // I'm using setState here with this function (prevState) since the React's setState method is async.
     // So it's better to use it in this way when our new state depends on the current this.state value
     // Ref: https://reactjs.org/docs/react-component.html#setstate
+    
     this.setState((prevState) => {
-      const { ingredients, price, ingemp } = prevState;
-
+      const { ingredients, totalPrice, ingemp } = prevState;
+      
       const oldCount = ingredients[type];
       const updatedCount = oldCount + 1;
       const updatedIngredients = {
         ...ingredients,
       };
+      this.purchasableHandler(ingredients);
       const updatedInfo = {
         ...ingemp,
       };
       updatedIngredients[type] = updatedCount;
       const priceAddition = INGREDIENT_PRICES[type];
-      const updatedPrice = price + priceAddition;
+      
+      const updatedPrice = totalPrice + priceAddition;
       updatedInfo[type] = false;
-
+      
       return {
         totalPrice: updatedPrice,
         ingredients: updatedIngredients,
@@ -63,20 +72,19 @@ export default class BurgerBuilder extends Component {
   };
 
   removeIngredientHandler = (type) => {
+   
     this.setState((prevState) => {
-      const { ingredients, prevState, totalPrice } = prevState;
+      const { ingredients, totalPrice } = prevState;
       const updatedcount = ingredients[type] === 0 ? 0 : ingredients[type] - 1;
       const updatedIngredients = { ...ingredients };
-      let updatedInfo = { ...ingemp };
+      let updatedInfo = { ...this.state.ingemp };
+      this.purchasableHandler(ingredients);
       updatedIngredients[type] = updatedcount;
 
       const updatedPrice =
-        ingredients[type] === 0
-          ? 0
-          : totalPrice[type] - INGREDIENT_PRICES[type];
+        ingredients[type] === 0 ? 0 : totalPrice - INGREDIENT_PRICES[type];
 
       if (ingredients[type] === 1) {
-        console.log('entrei');
         updatedInfo[type] = true;
       }
       return {
@@ -88,6 +96,7 @@ export default class BurgerBuilder extends Component {
   };
 
   render() {
+    
     return (
       <div id="builder">
         <div>
@@ -96,7 +105,9 @@ export default class BurgerBuilder extends Component {
         <BuildControls
           ingredientAdded={this.addIngredientHandler}
           ingredientRemoved={this.removeIngredientHandler}
+          price={this.state.totalPrice}
           disabled={this.state.ingemp}
+          purchasable={this.state.purchasable}
         />
       </div>
     );
