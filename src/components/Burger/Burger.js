@@ -1,29 +1,35 @@
-import React from "react";
-import BurgerIngredient from "./BurgerIngredient/BurgerIngredient";
-import "./Burger.scss";
-const Burger = (props) => {
-  const ingredientsArr = Object.keys(props.ingredients)
-    .map((igKey) => {
-      return [...Array(props.ingredients[igKey])].map(() => {
-        return igKey;
-      });
-    })
-    .reduce((prev, cur) => {
-      return prev.concat(cur);
-    }, []);
+import React, { useState, useEffect } from 'react';
+import BurgerIngredient from './BurgerIngredient/BurgerIngredient';
+import './Burger.scss';
 
-  
-  let emptyHamb = null
-  if(ingredientsArr.length===0){
-    emptyHamb = <p>Insert some ingredients</p>
-  }
+// Destruct the props.
+const Burger = ({ ingredients }) => {
+  const [normalizedArr, setNormalizedArr] = useState([]);
+
+  useEffect(() => {
+    const ingredientsArr = Object.keys(ingredients)
+      .map((igKey) => {
+        return [...Array(ingredients[igKey])].map(() => {
+          return igKey;
+        });
+      })
+      .reduce((prev, cur) => {
+        return prev.concat(cur);
+      }, []);
+
+    setNormalizedArr(ingredientsArr);
+  }, [ingredients]);
+
   return (
     <div id="Burger">
       <BurgerIngredient type="bread-top" />
-      {emptyHamb}
-      {ingredientsArr.map((el, i) => {
-        return <BurgerIngredient type={el} key={el + i} />;
-      })}
+      {normalizedArr.length === 0 ? (
+        <p>Insert some ingredients</p>
+      ) : (
+        normalizedArr.map((el, i) => {
+          return <BurgerIngredient type={el} key={el + i} />;
+        })
+      )}
       <BurgerIngredient type="bread-bottom" />
     </div>
   );
